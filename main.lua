@@ -4,7 +4,7 @@ local TimerAddon = {
     name = "Timer",
     author = "Delarme",
     desc = "Timer windows",
-    version = "1.2"
+    version = "1.2.1"
 }
 --692,495
 CLOCKBTN = {
@@ -140,10 +140,22 @@ end
 
 local function OnLoad()
     TimerWnd = api.Interface:CreateEmptyWindow("timerAddonWnd", "UIParent")
-    TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -350, 0)
+
+    local uiscale = api.Interface:GetUIScale()
+	TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -280 * uiscale - 40, 0)
     TimerWnd:SetExtent(28, 28)
+    --TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -320 * uiscale, 0)
+    --TimerWnd.OnScale = function ()
+        --TimerWnd:RemoveAllAnchors()
+
+    --end
+    --TimerWnd.OnScale() 
+    
+    
     TimerWnd:Show(true)
-   
+
+    TimerWnd:SetHandler("OnScale", TimerWnd.OnScale)
+    
     local clockBtn = TimerWnd:CreateChildWidget("button", "clockBtn", 0, true)  
     clockBtn:AddAnchor("TOPLEFT", TimerWnd, 0, 0)
     clockBtn:AddAnchor("BOTTOMRIGHT", TimerWnd, 0, 0)
@@ -189,6 +201,7 @@ end
 local function OnUnload()
     if TimerWnd ~= nil then
         TimerWnd:Show(false)
+        --TimerWnd:ReleaseHandler("OnScale")
         TimerWnd = nil
     end
     if OpenWindows ~= nil then
