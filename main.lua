@@ -4,7 +4,7 @@ local TimerAddon = {
     name = "Timer",
     author = "Delarme",
     desc = "Timer windows",
-    version = "1.2.1"
+    version = "1.2.2"
 }
 --692,495
 CLOCKBTN = {
@@ -138,11 +138,29 @@ function ClockBtnOnClick()
     end
 end
 
+
+local function Update(dt)
+    for i = 1, #OpenWindows do
+        local success, result = pcall(OpenWindows[i].OnUpdate, dt)
+        if success == false then
+            api.Log:Err(result)
+        end
+        --OpenWindows[i]:OnUpdate(dt)
+    end
+end
+
+local function OnUpdate(dt)
+    local success, result = pcall(Update, dt)
+    if success == false then
+        api.Log:Err(result)
+    end
+end
+
 local function OnLoad()
     TimerWnd = api.Interface:CreateEmptyWindow("timerAddonWnd", "UIParent")
 
     local uiscale = api.Interface:GetUIScale()
-	TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -280 * uiscale - 40, 0)
+	TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -360 * uiscale - 40, 0)
     TimerWnd:SetExtent(28, 28)
     --TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -320 * uiscale, 0)
     --TimerWnd.OnScale = function ()
@@ -154,7 +172,7 @@ local function OnLoad()
     
     TimerWnd:Show(true)
 
-    TimerWnd:SetHandler("OnScale", TimerWnd.OnScale)
+    --TimerWnd:SetHandler("OnScale", TimerWnd.OnScale)
     
     local clockBtn = TimerWnd:CreateChildWidget("button", "clockBtn", 0, true)  
     clockBtn:AddAnchor("TOPLEFT", TimerWnd, 0, 0)
@@ -179,24 +197,11 @@ local function OnLoad()
             timer:Import(record)
         end
     end
+
+    api.On("UPDATE", OnUpdate)
 end
 
-local function Update(dt)
-    for i = 1, #OpenWindows do
-        local success, result = pcall(OpenWindows[i].OnUpdate, dt)
-        if success == false then
-            api.Log:Err(result)
-        end
-        --OpenWindows[i]:OnUpdate(dt)
-    end
-end
 
-local function OnUpdate(dt)
-    local success, result = pcall(Update, dt)
-    if success == false then
-        api.Log:Err(result)
-    end
-end
 
 local function OnUnload()
     if TimerWnd ~= nil then
@@ -221,7 +226,7 @@ local function OnUnload()
         Utils.Unload()
     end
 end
-api.On("UPDATE", OnUpdate)
+
 TimerAddon.OnLoad = OnLoad
 TimerAddon.OnUnload = OnUnload
 
